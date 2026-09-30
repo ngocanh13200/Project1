@@ -80,6 +80,20 @@
   }
   .brand .slash { color: var(--amber); }
 
+  .nav { display: flex; gap: 4px; }
+  .nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 15px;
+    border-radius: 999px;
+    transition: all .18s ease;
+  }
+  .nav a:hover { color: var(--text); background: rgba(76,224,90,.07); }
+  .nav a.active { color: var(--phosphor); background: rgba(76,224,90,.12); }
+  .nav a:focus-visible { outline: 2px solid var(--phosphor); outline-offset: 2px; }
+
   .search-box { position: relative; flex: 1; min-width: 190px; max-width: 360px; }
   .search-box input {
     width: 100%;
@@ -513,6 +527,10 @@
 
   <header class="topbar">
     <div class="brand">METEO<span class="slash">·</span>RADAR</div>
+    <nav class="nav">
+      <a href="weather.html" class="active">Thời tiết</a>
+      <a href="news.html">Tin tức</a>
+    </nav>
     <div class="search-box">
       <input type="text" id="searchInput" placeholder="Tìm thành phố..." aria-label="Tìm thành phố" autocomplete="off">
       <div class="suggest" id="suggest"></div>
