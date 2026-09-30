@@ -612,8 +612,8 @@
     if (!stamped) {
       stamped = true;
       ticket.classList.add("stamped");
-      setTimeout(function () { ticket.classList.remove("stamped"); }, 2600);
     }
+    setTimeout(function () { window.location.href = "login.html"; }, 1500);
   });
 })();
 </script>

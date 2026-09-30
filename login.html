@@ -594,18 +594,24 @@
       return;
     }
     var email = emailEl.value.trim();
-    tName.textContent = deriveName(email);
+    var name = deriveName(email);
+    tName.textContent = name;
     tName.classList.remove("blank");
     var seat = seats[Math.floor(Math.random() * seats.length)];
     tSeats.forEach(function (el) { el.textContent = seat; });
+    sessionStorage.setItem("skygate_session", JSON.stringify({
+      name: name,
+      email: email,
+      seat: seat
+    }));
     btn.textContent = "Đã đăng nhập ✓";
     btn.classList.add("done");
     btn.disabled = true;
     if (!stamped) {
       stamped = true;
       ticket.classList.add("stamped");
-      setTimeout(function () { ticket.classList.remove("stamped"); }, 2800);
     }
+    setTimeout(function () { window.location.href = "dashboard.html"; }, 900);
   });
 })();
 </script>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkyGate — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #081A2E;
+    --panel: #0E2740;
+    --panel-edge: #173650;
+    --paper: #FBF6EC;
+    --ink: #1D2733;
+    --ink-soft: #5B6672;
+    --teal: #14C4B2;
+    --teal-dark: #0E9C8E;
+    --gold: #E0A83E;
+    --danger: #E5484D;
+    --line: #E6DECB;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    color: var(--paper);
+    background:
+      radial-gradient(1200px 560px at 90% -10%, rgba(224,168,62,.13), transparent 60%),
+      radial-gradient(900px 480px at -10% 100%, rgba(20,196,178,.15), transparent 55%),
+      var(--bg);
+    min-height: 100vh;
+  }
+
+  /* ---------- Top bar ---------- */
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px clamp(20px, 5vw, 56px);
+    border-bottom: 1px solid rgba(23,54,80,.7);
+    background: rgba(8,26,46,.6);
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .brand {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 19px;
+    letter-spacing: .04em;
+  }
+  .brand span { color: var(--gold); }
+
+  .user-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--teal);
+    color: #06231F;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+  }
+  .uname {
+    font-size: 14px;
+    font-weight: 600;
+    color: #CFDCE9;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .logout {
+    background: none;
+    border: 1px solid var(--panel-edge);
+    color: #9DB3CB;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 9px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all .18s ease;
+  }
+  .logout:hover {
+    border-color: var(--teal);
+    color: var(--teal);
+    background: rgba(20,196,178,.08);
+  }
+  .logout:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+  .logout:active { transform: translateY(1px); }
+
+  /* ---------- Main ---------- */
+
+  main {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: clamp(28px, 5vw, 56px) clamp(20px, 5vw, 56px) 60px;
+  }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--teal);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 26px;
+    height: 1px;
+    background: var(--teal);
+  }
+
+  h1 {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 700;
+    letter-spacing: -.02em;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  h1 .accent { color: var(--gold); }
+
+  .lead {
+    color: #9DB3CB;
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 540px;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    background: rgba(20,196,178,.1);
+    border: 1px solid rgba(20,196,178,.35);
+    color: var(--teal);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 999px;
+  }
+  .status-pill .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--teal);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .45; transform: scale(.8); }
+  }
+
+  .content {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 36px;
+    align-items: start;
+  }
+
+  /* ---------- Info cards ---------- */
+
+  .cards { display: grid; gap: 14px; }
+
+  .card {
+    background: rgba(251,246,236,.045);
+    border: 1px solid var(--panel-edge);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: border-color .18s ease, transform .18s ease;
+  }
+  .card:hover { border-color: #2A4A6A; transform: translateY(-1px); }
+
+  .card .icon {
+    width: 40px;
+    height: 40px;
+    flex: none;
+    border-radius: 11px;
+    background: rgba(20,196,178,.12);
+    color: var(--teal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .card .icon.gold { background: rgba(224,168,62,.12); color: var(--gold); }
+
+  .card .k { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: #7E96AF; margin-bottom: 3px; }
+  .card .v { font-family: "Space Grotesk", sans-serif; font-size: 17px; font-weight: 600; }
+
+  .profile-card {
+    background: rgba(251,246,236,.065);
+    border: 1px solid var(--panel-edge);
+    border-radius: var(--radius);
+    padding: 18px;
+  }
+  .profile-card .k { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: #7E96AF; margin-bottom: 8px; }
+  .profile-card .email {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+    color: #CFDCE9;
+    word-break: break-all;
+  }
+
+  /* ---------- Ticket ---------- */
+
+  .ticket {
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,.55);
+    max-width: 440px;
+  }
+
+  .ticket-head {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .ticket-head .brand { font-size: 16px; }
+  .ticket-head .tag {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: .18em;
+    color: var(--teal);
+    text-transform: uppercase;
+  }
+
+  .ticket-body { padding: 22px 20px 18px; }
+
+  .route {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .route .city { font-family: "Space Grotesk", sans-serif; font-size: 30px; font-weight: 700; letter-spacing: -.02em; }
+  .route .flight {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: .14em;
+    color: var(--ink-soft);
+    text-align: center;
+  }
+  .route .flight b { display: block; color: var(--gold); font-size: 13px; letter-spacing: .08em; margin-top: 2px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .cell .k {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+  .cell .v {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .dashed {
+    border-top: 2px dashed var(--line);
+    position: relative;
+    margin: 0 20px;
+  }
+  .dashed::before, .dashed::after {
+    content: "";
+    position: absolute;
+    top: -11px;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--bg);
+  }
+  .dashed::before { left: -30px; }
+  .dashed::after { right: -30px; }
+
+  .ticket-foot {
+    padding: 16px 20px 20px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .barcode {
+    height: 46px;
+    flex: 1;
+    background-image: repeating-linear-gradient(
+      90deg,
+      var(--ink) 0 2px, transparent 2px 5px,
+      var(--ink) 5px 6px, transparent 6px 9px,
+      var(--ink) 9px 12px, transparent 12px 14px,
+      var(--ink) 14px 15px, transparent 15px 19px
+    );
+    mask-image: linear-gradient(90deg, #000 85%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent);
+  }
+  .seat .k { font-size: 10px; text-transform: uppercase; letter-spacing: .14em; color: var(--ink-soft); }
+  .seat .v { font-family: "IBM Plex Mono", monospace; font-size: 22px; font-weight: 600; }
+
+  /* ---------- Motion ---------- */
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero > * { animation: rise .55s cubic-bezier(.2,.7,.3,1) both; }
+    .hero > *:nth-child(2) { animation-delay: .05s; }
+    .hero > *:nth-child(3) { animation-delay: .1s; }
+    .content > * { animation: rise .65s cubic-bezier(.2,.7,.3,1) .1s both; }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  }
+
+  /* ---------- Responsive ---------- */
+
+  @media (max-width: 780px) {
+    .content { grid-template-columns: 1fr; }
+    .ticket { max-width: 420px; }
+    .uname { display: none; }
+  }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">SKY<span>GATE</span></div>
+    <div class="user-area">
+      <div class="avatar" id="avatar">—</div>
+      <span class="uname" id="uname">—</span>
+      <button class="logout" id="logoutBtn" type="button">Đăng xuất</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Trạng thái chuyến bay</p>
+      <h1>Chào mừng trở lại, <span class="accent" id="firstName">Hành khách</span></h1>
+      <p class="lead">Chuyến bay của bạn đã sẵn sàng. Thẻ lên máy bay bên dưới — vui lòng đến cổng trước giờ lên tàu.</p>
+      <span class="status-pill"><span class="dot"></span>Đã check-in</span>
+    </section>
+
+    <section class="content">
+      <div class="cards">
+        <div class="card">
+          <div class="icon">✈</div>
+          <div>
+            <div class="k">Chuyến bay</div>
+            <div class="v">SKG-042 · HAN → SGN</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="icon gold">⏰</div>
+          <div>
+            <div class="k">Giờ lên tàu</div>
+            <div class="v" id="cTime">09:45</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="icon">◫</div>
+          <div>
+            <div class="k">Cổng / Ghế</div>
+            <div class="v" id="cGate">A7 · 12C</div>
+          </div>
+        </div>
+        <div class="profile-card">
+          <div class="k">Tài khoản đang đăng nhập</div>
+          <div class="email" id="cEmail">—</div>
+        </div>
+      </div>
+
+      <div class="ticket" aria-hidden="true">
+        <div class="ticket-head">
+          <div class="brand">SKY<span>GATE</span></div>
+          <div class="tag">Boarding Pass</div>
+        </div>
+        <div class="ticket-body">
+          <div class="route">
+            <span class="city">HAN</span>
+            <span class="flight">Flight<b>SKG-042</b></span>
+            <span class="city">SGN</span>
+          </div>
+          <div class="grid">
+            <div class="cell">
+              <div class="k">Hành khách</div>
+              <div class="v" id="tName">—</div>
+            </div>
+            <div class="cell">
+              <div class="k">Cổng</div>
+              <div class="v">A7</div>
+            </div>
+            <div class="cell">
+              <div class="k">Ghế</div>
+              <div class="v" id="tSeat">—</div>
+            </div>
+          </div>
+          <div class="grid">
+            <div class="cell">
+              <div class="k">Email</div>
+              <div class="v" id="tMail">—</div>
+            </div>
+            <div class="cell">
+              <div class="k">Ngày</div>
+              <div class="v" id="tDate">—</div>
+            </div>
+            <div class="cell">
+              <div class="k">Giờ lên tàu</div>
+              <div class="v">09:45</div>
+            </div>
+          </div>
+        </div>
+        <div class="dashed"></div>
+        <div class="ticket-foot">
+          <div class="barcode"></div>
+          <div class="seat">
+            <div class="k">Ghế</div>
+            <div class="v" id="tSeatFoot">—</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+<script>
+(function () {
+  var raw = sessionStorage.getItem("skygate_session");
+  if (!raw) {
+    window.location.replace("login.html");
+    return;
+  }
+
+  var user;
+  try { user = JSON.parse(raw); } catch (e) { user = null; }
+  if (!user || !user.email) {
+    sessionStorage.removeItem("skygate_session");
+    window.location.replace("login.html");
+    return;
+  }
+
+  var name = user.name || "Hành khách";
+  var email = user.email;
+  var seat = user.seat || "12C";
+
+  var initials = name.split(/\s+/).filter(Boolean).slice(0, 2)
+    .map(function (w) { return w.charAt(0).toUpperCase(); })
+    .join("") || "HK";
+
+  document.getElementById("avatar").textContent = initials;
+  document.getElementById("uname").textContent = name;
+  document.getElementById("firstName").textContent = name.split(/\s+/)[0];
+  document.getElementById("cEmail").textContent = email;
+  document.getElementById("tName").textContent = name.toUpperCase();
+  document.getElementById("tMail").textContent = email;
+  document.getElementById("tSeat").textContent = seat;
+  document.getElementById("tSeatFoot").textContent = seat;
+  document.getElementById("cGate").textContent = "A7 · " + seat;
+
+  var today = new Date();
+  var dd = String(today.getDate()).padStart(2, "0");
+  var mm = String(today.getMonth() + 1).padStart(2, "0");
+  var dateStr = dd + "/" + mm + "/" + today.getFullYear();
+  document.getElementById("tDate").textContent = dateStr;
+
+  document.getElementById("logoutBtn").addEventListener("click", function () {
+    sessionStorage.removeItem("skygate_session");
+    window.location.href = "login.html";
+  });
+})();
+</script>
+</body>
+</html>
