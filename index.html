@@ -511,6 +511,7 @@
 
   </main>
 
+<script src="store.js"></script>
 <script>
 (function () {
   var form = document.getElementById("registerForm");
@@ -606,6 +607,21 @@
       if (firstBad) firstBad.focus();
       return;
     }
+    var email = emailEl.value.trim();
+    var emailField = document.querySelector('[data-field="email"]');
+    var emailErr = emailField.querySelector(".err");
+    var existing = window.SkyGateStore.findByEmail(email);
+    if (existing) {
+      emailErr.textContent = "Email này đã được đăng ký.";
+      setInvalid(emailField, true);
+      emailEl.focus();
+      return;
+    }
+    window.SkyGateStore.add({
+      name: nameEl.value.trim(),
+      email: email,
+      password: passEl.value
+    });
     btn.textContent = "Đã tạo tài khoản ✓";
     btn.classList.add("done");
     btn.disabled = true;

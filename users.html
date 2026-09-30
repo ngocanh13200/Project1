@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkyGate — Quản lý người dùng</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #081A2E;
+    --panel: #0E2740;
+    --panel-edge: #173650;
+    --paper: #FBF6EC;
+    --ink: #1D2733;
+    --ink-soft: #5B6672;
+    --teal: #14C4B2;
+    --teal-dark: #0E9C8E;
+    --gold: #E0A83E;
+    --danger: #E5484D;
+    --line: #E6DECB;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    color: var(--paper);
+    background:
+      radial-gradient(1200px 560px at 90% -10%, rgba(224,168,62,.13), transparent 60%),
+      radial-gradient(900px 480px at -10% 100%, rgba(20,196,178,.15), transparent 55%),
+      var(--bg);
+    min-height: 100vh;
+  }
+
+  /* ---------- Top bar ---------- */
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px clamp(20px, 5vw, 56px);
+    border-bottom: 1px solid rgba(23,54,80,.7);
+    background: rgba(8,26,46,.6);
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+
+  .brand {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 19px;
+    letter-spacing: .04em;
+  }
+  .brand span { color: var(--gold); }
+
+  .user-area { display: flex; align-items: center; gap: 12px; }
+  .avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--teal);
+    color: #06231F;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+  }
+  .uname {
+    font-size: 14px; font-weight: 600; color: #CFDCE9;
+    max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .nav-link {
+    color: #9DB3CB; text-decoration: none; font-size: 13.5px; font-weight: 600;
+    padding: 9px 16px; border-radius: 999px; transition: all .18s ease;
+  }
+  .nav-link:hover { color: var(--teal); background: rgba(20,196,178,.08); }
+  .nav-link:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+  .logout {
+    background: none; border: 1px solid var(--panel-edge); color: #9DB3CB;
+    font-family: inherit; font-size: 13.5px; font-weight: 600;
+    padding: 9px 16px; border-radius: 999px; cursor: pointer; transition: all .18s ease;
+  }
+  .logout:hover { border-color: var(--teal); color: var(--teal); background: rgba(20,196,178,.08); }
+  .logout:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+  .logout:active { transform: translateY(1px); }
+
+  /* ---------- Main ---------- */
+
+  main {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: clamp(28px, 5vw, 48px) clamp(20px, 5vw, 56px) 60px;
+  }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--teal);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .eyebrow::before { content: ""; width: 26px; height: 1px; background: var(--teal); }
+
+  h1 {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(28px, 4vw, 38px);
+    font-weight: 700;
+    letter-spacing: -.02em;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+
+  .lead { color: #9DB3CB; font-size: 15px; line-height: 1.6; max-width: 560px; }
+
+  /* ---------- Stats ---------- */
+
+  .stats {
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .stat {
+    background: rgba(251,246,236,.045);
+    border: 1px solid var(--panel-edge);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+  }
+  .stat .num {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--teal);
+    letter-spacing: -.01em;
+  }
+  .stat .num.gold { color: var(--gold); }
+  .stat .k { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: #7E96AF; margin-top: 4px; }
+
+  /* ---------- Toolbar ---------- */
+
+  .toolbar {
+    margin-top: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .search {
+    position: relative;
+    flex: 1;
+    min-width: 220px;
+    max-width: 360px;
+  }
+  .search input {
+    width: 100%;
+    background: rgba(251,246,236,.055);
+    border: 1px solid var(--panel-edge);
+    border-radius: 999px;
+    color: var(--paper);
+    font-family: inherit;
+    font-size: 14px;
+    padding: 11px 16px 11px 40px;
+    transition: border-color .18s ease, box-shadow .18s ease;
+  }
+  .search input::placeholder { color: #5E7790; }
+  .search input:focus {
+    outline: none;
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(20,196,178,.18);
+  }
+  .search::before {
+    content: "⌕";
+    position: absolute;
+    left: 15px; top: 50%;
+    transform: translateY(-52%);
+    color: #5E7790;
+    font-size: 17px;
+  }
+
+  .btn-add {
+    background: var(--teal);
+    color: #06231F;
+    border: none;
+    border-radius: 999px;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 14.5px;
+    font-weight: 700;
+    padding: 11px 22px;
+    cursor: pointer;
+    transition: background .18s ease, transform .1s ease, box-shadow .18s ease;
+    box-shadow: 0 8px 20px -10px rgba(20,196,178,.55);
+  }
+  .btn-add:hover { background: #2BD3C2; }
+  .btn-add:active { transform: translateY(1px); }
+  .btn-add:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; }
+
+  /* ---------- Table ---------- */
+
+  .table-wrap {
+    margin-top: 18px;
+    background: rgba(251,246,236,.035);
+    border: 1px solid var(--panel-edge);
+    border-radius: var(--radius);
+    overflow-x: auto;
+  }
+  table { width: 100%; border-collapse: collapse; min-width: 680px; }
+  thead th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: #7E96AF;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--panel-edge);
+    font-weight: 600;
+  }
+  tbody td {
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(23,54,80,.55);
+    font-size: 14px;
+    color: #CFDCE9;
+    vertical-align: middle;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr { transition: background .15s ease; }
+  tbody tr:hover { background: rgba(251,246,236,.03); }
+
+  .cell-user { display: flex; align-items: center; gap: 12px; }
+  .cell-user .mini-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(224,168,62,.16);
+    color: var(--gold);
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 12.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+  }
+  .cell-user .nm { font-weight: 600; color: var(--paper); }
+  .cell-mail { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; color: #9DB3CB; }
+  .cell-date { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; color: #7E96AF; }
+  .cell-id { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: #5E7790; }
+
+  .actions { display: flex; gap: 8px; justify-content: flex-end; }
+  .act {
+    background: none;
+    border: 1px solid var(--panel-edge);
+    color: #9DB3CB;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 7px 13px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .act:hover { border-color: var(--teal); color: var(--teal); }
+  .act.danger:hover { border-color: var(--danger); color: var(--danger); }
+  .act:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+
+  .empty {
+    text-align: center;
+    padding: 48px 20px;
+    color: #7E96AF;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .empty b { color: #CFDCE9; }
+
+  /* ---------- Modal ---------- */
+
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(4,14,25,.72);
+    backdrop-filter: blur(3px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 40;
+  }
+  .modal-backdrop.open { display: flex; }
+
+  .modal {
+    width: 100%;
+    max-width: 420px;
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    border-radius: 18px;
+    padding: 26px;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,.6);
+  }
+  .modal h2 {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    margin-bottom: 6px;
+  }
+  .modal .sub { font-size: 13px; color: #7E96AF; margin-bottom: 20px; }
+
+  .modal .field { margin-bottom: 16px; }
+  .modal .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #CFDCE9;
+    margin-bottom: 7px;
+  }
+  .modal .field input {
+    width: 100%;
+    background: rgba(251,246,236,.055);
+    border: 1px solid var(--panel-edge);
+    border-radius: 11px;
+    color: var(--paper);
+    font-family: inherit;
+    font-size: 14.5px;
+    padding: 12px 14px;
+    transition: border-color .18s ease, box-shadow .18s ease;
+  }
+  .modal .field input::placeholder { color: #5E7790; }
+  .modal .field input:focus {
+    outline: none;
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(20,196,178,.18);
+  }
+  .modal .field input[aria-invalid="true"] {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px rgba(229,72,77,.15);
+  }
+  .modal .err {
+    visibility: hidden;
+    min-height: 18px;
+    font-size: 12.5px;
+    color: #FF9A9C;
+    margin-top: 5px;
+  }
+  .modal .field.invalid .err { visibility: visible; }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+  }
+  .btn-primary {
+    flex: 1;
+    background: var(--teal);
+    color: #06231F;
+    border: none;
+    border-radius: 11px;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 12px;
+    cursor: pointer;
+    transition: background .18s ease;
+  }
+  .btn-primary:hover { background: #2BD3C2; }
+  .btn-primary:focus-visible { outline: 2px solid var(--paper); outline-offset: 2px; }
+  .btn-ghost {
+    flex: 1;
+    background: none;
+    border: 1px solid var(--panel-edge);
+    color: #9DB3CB;
+    border-radius: 11px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 12px;
+    cursor: pointer;
+    transition: all .18s ease;
+  }
+  .btn-ghost:hover { border-color: #43607F; color: var(--paper); }
+  .btn-ghost:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+
+  .btn-danger {
+    flex: 1;
+    background: var(--danger);
+    color: #fff;
+    border: none;
+    border-radius: 11px;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 12px;
+    cursor: pointer;
+    transition: background .18s ease;
+  }
+  .btn-danger:hover { background: #F05A5F; }
+  .btn-danger:focus-visible { outline: 2px solid var(--paper); outline-offset: 2px; }
+
+  /* ---------- Toast ---------- */
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px 22px;
+    border-radius: 999px;
+    box-shadow: 0 16px 40px -12px rgba(0,0,0,.6);
+    opacity: 0;
+    pointer-events: none;
+    transition: all .25s ease;
+    z-index: 60;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ---------- Motion ---------- */
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero > * { animation: rise .5s cubic-bezier(.2,.7,.3,1) both; }
+    .hero > *:nth-child(2) { animation-delay: .05s; }
+    .hero > *:nth-child(3) { animation-delay: .1s; }
+    .stats, .toolbar, .table-wrap { animation: rise .6s cubic-bezier(.2,.7,.3,1) .12s both; }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  }
+
+  /* ---------- Responsive ---------- */
+
+  @media (max-width: 720px) {
+    .stats { grid-template-columns: 1fr; }
+    .uname { display: none; }
+  }
+
+  @media (max-width: 660px) {
+    .topbar { flex-wrap: wrap; row-gap: 10px; }
+  }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">SKY<span>GATE</span></div>
+    <div class="user-area">
+      <div class="avatar" id="avatar">—</div>
+      <span class="uname" id="uname">—</span>
+      <a class="nav-link" href="dashboard.html">Dashboard</a>
+      <button class="logout" id="logoutBtn" type="button">Đăng xuất</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Admin · Quản lý</p>
+      <h1>Người dùng</h1>
+      <p class="lead">Danh sách tài khoản đã đăng ký. Bạn có thể thêm, sửa và xóa người dùng.</p>
+    </section>
+
+    <section class="stats">
+      <div class="stat">
+        <div class="num" id="statTotal">0</div>
+        <div class="k">Tổng người dùng</div>
+      </div>
+      <div class="stat">
+        <div class="num gold" id="statToday">0</div>
+        <div class="k">Đăng ký hôm nay</div>
+      </div>
+      <div class="stat">
+        <div class="num" id="statActive">0</div>
+        <div class="k">Đang đăng nhập</div>
+      </div>
+    </section>
+
+    <section class="toolbar">
+      <div class="search">
+        <input type="search" id="searchInput" placeholder="Tìm theo tên hoặc email..." aria-label="Tìm người dùng">
+      </div>
+      <button class="btn-add" id="addBtn" type="button">+ Thêm user</button>
+    </section>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Người dùng</th>
+            <th>Email</th>
+            <th>Ngày tạo</th>
+            <th style="text-align:right;">Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="empty" id="emptyState" style="display:none;">
+        <b>Chưa có người dùng nào.</b><br>
+        Đăng ký tài khoản ở trang đăng ký hoặc bấm "+ Thêm user".
+      </div>
+    </div>
+  </main>
+
+  <!-- Add / Edit modal -->
+  <div class="modal-backdrop" id="userModalBackdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h2 id="modalTitle">Thêm user</h2>
+      <p class="sub" id="modalSub">Nhập thông tin tài khoản mới.</p>
+      <form id="userForm" novalidate>
+        <div class="field" data-field="name">
+          <label for="mName">Họ và tên</label>
+          <input type="text" id="mName" placeholder="Nguyễn Văn A" autocomplete="off">
+          <p class="err">Vui lòng nhập họ và tên.</p>
+        </div>
+        <div class="field" data-field="email">
+          <label for="mEmail">Email</label>
+          <input type="email" id="mEmail" placeholder="ban@vidu.com" autocomplete="off">
+          <p class="err" id="mEmailErr">Email không hợp lệ.</p>
+        </div>
+        <div class="field" data-field="password">
+          <label for="mPassword">Mật khẩu</label>
+          <input type="password" id="mPassword" placeholder="Ít nhất 8 ký tự" autocomplete="new-password">
+          <p class="err">Mật khẩu phải có ít nhất 8 ký tự.</p>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-ghost" id="cancelBtn">Hủy</button>
+          <button type="submit" class="btn-primary" id="saveBtn">Lưu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete confirm modal -->
+  <div class="modal-backdrop" id="delModalBackdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="delTitle">
+      <h2 id="delTitle">Xóa người dùng?</h2>
+      <p class="sub" id="delSub">Hành động này không thể hoàn tác.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" id="delCancelBtn">Hủy</button>
+        <button type="button" class="btn-danger" id="delConfirmBtn">Xóa</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script src="store.js"></script>
+<script>
+(function () {
+  var raw = sessionStorage.getItem("skygate_session");
+  if (!raw) {
+    window.location.replace("login.html");
+    return;
+  }
+  var session;
+  try { session = JSON.parse(raw); } catch (e) { session = null; }
+  if (!session || !session.email) {
+    sessionStorage.removeItem("skygate_session");
+    window.location.replace("login.html");
+    return;
+  }
+
+  document.getElementById("avatar").textContent =
+    (session.name || "HK").split(/\s+/).filter(Boolean).slice(0, 2)
+      .map(function (w) { return w.charAt(0).toUpperCase(); }).join("") || "HK";
+  document.getElementById("uname").textContent = session.name || session.email;
+
+  document.getElementById("logoutBtn").addEventListener("click", function () {
+    sessionStorage.removeItem("skygate_session");
+    window.location.href = "login.html";
+  });
+
+  /* ---------- Render ---------- */
+
+  var tbody = document.getElementById("tbody");
+  var emptyState = document.getElementById("emptyState");
+  var searchInput = document.getElementById("searchInput");
+  var currentFilter = "";
+
+  function fmtDate(iso) {
+    if (!iso) return "—";
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return "—";
+    var dd = String(d.getDate()).padStart(2, "0");
+    var mm = String(d.getMonth() + 1).padStart(2, "0");
+    var hh = String(d.getHours()).padStart(2, "0");
+    var mi = String(d.getMinutes()).padStart(2, "0");
+    return dd + "/" + mm + "/" + d.getFullYear() + " " + hh + ":" + mi;
+  }
+
+  function initials(name) {
+    return (name || "").split(/\s+/).filter(Boolean).slice(0, 2)
+      .map(function (w) { return w.charAt(0).toUpperCase(); }).join("") || "?";
+  }
+
+  function render() {
+    var users = window.SkyGateStore.getAll();
+    var q = currentFilter.trim().toLowerCase();
+    var filtered = users.filter(function (u) {
+      if (!q) return true;
+      return u.name.toLowerCase().indexOf(q) !== -1 ||
+             u.email.toLowerCase().indexOf(q) !== -1;
+    });
+
+    document.getElementById("statTotal").textContent = users.length;
+    var today = new Date();
+    var todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+    var todayCount = users.filter(function (u) {
+      return u.createdAt && new Date(u.createdAt).getTime() >= todayStart;
+    }).length;
+    document.getElementById("statToday").textContent = todayCount;
+    document.getElementById("statActive").textContent = session ? 1 : 0;
+
+    tbody.innerHTML = "";
+    if (filtered.length === 0) {
+      emptyState.style.display = "block";
+      return;
+    }
+    emptyState.style.display = "none";
+
+    filtered.forEach(function (u, i) {
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        '<td><div class="cell-user">' +
+          '<div class="mini-avatar">' + initials(u.name) + '</div>' +
+          '<span class="nm"></span>' +
+        '</div></td>' +
+        '<td class="cell-mail"></td>' +
+        '<td class="cell-date"></td>' +
+        '<td><div class="actions">' +
+          '<button type="button" class="act" data-act="edit">Sửa</button>' +
+          '<button type="button" class="act danger" data-act="del">Xóa</button>' +
+        '</div></td>';
+      tr.querySelector(".nm").textContent = u.name;
+      tr.querySelector(".cell-mail").textContent = u.email;
+      tr.querySelector(".cell-date").textContent = fmtDate(u.createdAt);
+      tr.querySelector('[data-act="edit"]').addEventListener("click", function () {
+        openEdit(u.id);
+      });
+      tr.querySelector('[data-act="del"]').addEventListener("click", function () {
+        openDelete(u.id);
+      });
+      tbody.appendChild(tr);
+    });
+  }
+
+  searchInput.addEventListener("input", function () {
+    currentFilter = searchInput.value;
+    render();
+  });
+
+  /* ---------- Add / Edit ---------- */
+
+  var backdrop = document.getElementById("userModalBackdrop");
+  var delBackdrop = document.getElementById("delModalBackdrop");
+  var form = document.getElementById("userForm");
+  var mName = document.getElementById("mName");
+  var mEmail = document.getElementById("mEmail");
+  var mPassword = document.getElementById("mPassword");
+  var modalTitle = document.getElementById("modalTitle");
+  var modalSub = document.getElementById("modalSub");
+  var saveBtn = document.getElementById("saveBtn");
+  var editingId = null;
+
+  function openModal() {
+    backdrop.classList.add("open");
+    mName.focus();
+  }
+  function closeModal() {
+    backdrop.classList.remove("open");
+    form.reset();
+    editingId = null;
+    form.querySelectorAll(".field").forEach(function (f) {
+      f.classList.remove("invalid");
+      var inp = f.querySelector("input");
+      if (inp) inp.removeAttribute("aria-invalid");
+    });
+  }
+
+  document.getElementById("addBtn").addEventListener("click", function () {
+    editingId = null;
+    modalTitle.textContent = "Thêm user";
+    modalSub.textContent = "Nhập thông tin tài khoản mới.";
+    saveBtn.textContent = "Lưu";
+    openModal();
+  });
+
+  document.getElementById("cancelBtn").addEventListener("click", closeModal);
+  backdrop.addEventListener("click", function (e) {
+    if (e.target === backdrop) closeModal();
+  });
+
+  function setInvalid(field, bad) {
+    field.classList.toggle("invalid", bad);
+    var inp = field.querySelector("input");
+    if (inp) inp.setAttribute("aria-invalid", bad ? "true" : "false");
+  }
+
+  function openEdit(id) {
+    var u = window.SkyGateStore.findById(id);
+    if (!u) return;
+    editingId = id;
+    modalTitle.textContent = "Sửa user";
+    modalSub.textContent = "Cập nhật thông tin cho " + u.email + ".";
+    mName.value = u.name;
+    mEmail.value = u.email;
+    mPassword.value = "";
+    mPassword.placeholder = "Để trống nếu không đổi mật khẩu";
+    saveBtn.textContent = "Cập nhật";
+    openModal();
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var nameOk = mName.value.trim().length >= 2;
+    var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mEmail.value.trim());
+    var passOk = editingId
+      ? mPassword.value === "" || mPassword.value.length >= 8
+      : mPassword.value.length >= 8;
+
+    setInvalid(form.querySelector('[data-field="name"]'), !nameOk);
+    setInvalid(form.querySelector('[data-field="email"]'), !emailOk);
+    setInvalid(form.querySelector('[data-field="password"]'), !passOk);
+
+    if (!nameOk || !emailOk || !passOk) {
+      var firstBad = form.querySelector(".field.invalid input");
+      if (firstBad) firstBad.focus();
+      return;
+    }
+
+    var email = mEmail.value.trim();
+    var dup = window.SkyGateStore.findByEmail(email);
+    if (dup && dup.id !== editingId) {
+      var emailErr = document.getElementById("mEmailErr");
+      emailErr.textContent = "Email này đã tồn tại.";
+      setInvalid(form.querySelector('[data-field="email"]'), true);
+      mEmail.focus();
+      return;
+    }
+
+    if (editingId) {
+      var patch = { name: mName.value.trim(), email: email };
+      if (mPassword.value !== "") patch.password = mPassword.value;
+      window.SkyGateStore.update(editingId, patch);
+      toast("Đã cập nhật user.");
+    } else {
+      window.SkyGateStore.add({
+        name: mName.value.trim(),
+        email: email,
+        password: mPassword.value
+      });
+      toast("Đã thêm user mới.");
+    }
+    closeModal();
+    render();
+  });
+
+  /* ---------- Delete ---------- */
+
+  var deletingId = null;
+
+  function openDelete(id) {
+    var u = window.SkyGateStore.findById(id);
+    if (!u) return;
+    deletingId = id;
+    document.getElementById("delSub").textContent =
+      "Bạn có chắc muốn xóa \"" + u.name + "\" (" + u.email + ")? Hành động này không thể hoàn tác.";
+    delBackdrop.classList.add("open");
+  }
+
+  document.getElementById("delCancelBtn").addEventListener("click", function () {
+    delBackdrop.classList.remove("open");
+    deletingId = null;
+  });
+  delBackdrop.addEventListener("click", function (e) {
+    if (e.target === delBackdrop) {
+      delBackdrop.classList.remove("open");
+      deletingId = null;
+    }
+  });
+  document.getElementById("delConfirmBtn").addEventListener("click", function () {
+    if (deletingId) {
+      window.SkyGateStore.remove(deletingId);
+      toast("Đã xóa user.");
+      render();
+    }
+    delBackdrop.classList.remove("open");
+    deletingId = null;
+  });
+
+  /* ---------- Toast ---------- */
+
+  var toastEl = document.getElementById("toast");
+  var toastTimer = null;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      toastEl.classList.remove("show");
+    }, 2400);
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
