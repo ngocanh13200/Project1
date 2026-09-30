@@ -215,7 +215,14 @@
     max-width: 760px;
     margin: 0 auto 18px;
   }
-  .hero h1 em { font-style: italic; color: var(--lantern); }
+  .hero h1 em {
+    font-style: italic;
+    background: linear-gradient(100deg, var(--lantern) 5%, var(--lantern-soft) 40%, var(--teal) 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 4px 22px rgba(255,138,61,.35));
+  }
   .hero p {
     color: var(--muted);
     font-size: 15.5px;
@@ -254,6 +261,49 @@
   }
   .hero .stat .k { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
+  /* ---------- Marquee ribbon ---------- */
+
+  .ribbon {
+    background: linear-gradient(90deg, var(--lantern), #E86A1E 50%, var(--lantern));
+    overflow: hidden;
+    padding: 9px 0;
+    border-top: 1px solid rgba(255,176,102,.5);
+    border-bottom: 1px solid rgba(232,106,30,.5);
+    box-shadow: 0 6px 24px -10px rgba(255,138,61,.5);
+    position: relative;
+  }
+  .ribbon::before, .ribbon::after {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 40px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .ribbon::before { left: 0; background: linear-gradient(90deg, var(--bg), transparent); }
+  .ribbon::after { right: 0; background: linear-gradient(-90deg, var(--bg), transparent); }
+  .ribbon-track {
+    display: inline-flex;
+    white-space: nowrap;
+    animation: ribbonScroll 26s linear infinite;
+    will-change: transform;
+  }
+  .ribbon-track span {
+    font-family: "Fraunces", serif;
+    font-weight: 700;
+    font-size: 14.5px;
+    letter-spacing: .06em;
+    color: #3A1F0A;
+    padding-right: 8px;
+  }
+  .ribbon-track span .sep { color: #7A3B12; padding: 0 14px; }
+  @keyframes ribbonScroll {
+    to { transform: translateX(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ribbon-track { animation: none; flex-wrap: wrap; white-space: normal; }
+  }
+
   /* ---------- Filters ---------- */
 
   main {
@@ -286,6 +336,21 @@
     border-color: var(--lantern);
     color: var(--lantern);
   }
+  .filters button.active[data-cat="Thủ công"] {
+    background: rgba(216,96,80,.16);
+    border-color: #D96050;
+    color: #E88A7A;
+  }
+  .filters button.active[data-cat="Thời trang"] {
+    background: rgba(184,104,198,.16);
+    border-color: #B868C6;
+    color: #D29BE0;
+  }
+  .filters button.active[data-cat="Trang trí"] {
+    background: rgba(45,212,191,.16);
+    border-color: var(--teal);
+    color: var(--teal);
+  }
   .filters button:focus-visible { outline: 2px solid var(--lantern); outline-offset: 2px; }
 
   /* ---------- Product grid ---------- */
@@ -303,9 +368,24 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    transition: border-color .18s ease, transform .18s ease;
+    position: relative;
+    transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
   }
-  .card:hover { border-color: rgba(255,138,61,.45); transform: translateY(-3px); }
+  .card:hover {
+    border-color: rgba(255,138,61,.55);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 44px -18px rgba(255,138,61,.35);
+  }
+  .card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, transparent 30%, rgba(247,239,224,.14) 48%, transparent 62%);
+    transform: translateX(-120%);
+    transition: transform .7s ease;
+    pointer-events: none;
+  }
+  .card:hover::after { transform: translateX(120%); }
 
   .tile {
     aspect-ratio: 4/3;
@@ -313,8 +393,28 @@
     align-items: center;
     justify-content: center;
     position: relative;
+    overflow: hidden;
   }
-  .tile svg { width: 78px; height: 78px; color: var(--paper); opacity: .92; }
+  .tile::before {
+    content: "";
+    position: absolute;
+    width: 150px; height: 150px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(247,239,224,.28), transparent 70%);
+    filter: blur(2px);
+    opacity: 0;
+    transition: opacity .3s ease;
+  }
+  .card:hover .tile::before { opacity: 1; }
+  .tile svg {
+    width: 78px; height: 78px;
+    color: var(--paper);
+    opacity: .92;
+    filter: drop-shadow(0 6px 14px rgba(0,0,0,.35));
+    transition: transform .35s cubic-bezier(.2,.7,.3,1);
+    position: relative;
+  }
+  .card:hover .tile svg { transform: scale(1.14) rotate(-4deg); }
   .tile .tag {
     position: absolute;
     top: 12px; left: 12px;
@@ -326,6 +426,19 @@
     color: var(--paper);
     border-radius: 999px;
     padding: 4px 10px;
+    backdrop-filter: blur(4px);
+  }
+  .tile .hot {
+    position: absolute;
+    bottom: 10px; right: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    color: #3A1F0A;
+    background: linear-gradient(135deg, var(--star), var(--lantern));
+    border-radius: 999px;
+    padding: 4px 10px;
+    box-shadow: 0 4px 14px -4px rgba(255,194,75,.7);
   }
   .tile.t-food { background: linear-gradient(135deg, #7A3B12, #C25E1E); }
   .tile.t-craft { background: linear-gradient(135deg, #5C2E2E, #9A4A3A); }
@@ -355,6 +468,7 @@
     font-size: 16px;
     font-weight: 600;
     color: var(--lantern);
+    text-shadow: 0 0 14px rgba(255,138,61,.35);
   }
   .card .price small { font-size: 11px; color: var(--muted); font-weight: 500; text-decoration: line-through; margin-right: 6px; }
 
@@ -646,6 +760,13 @@
     </div>
   </section>
 
+  <div class="ribbon" aria-hidden="true">
+    <div class="ribbon-track">
+      <span>Cà phê Đắk Lắk<span class="sep">✦</span>Lụa Hội An<span class="sep">✦</span>Gốm Bát Tràng<span class="sep">✦</span>Nón lá Huế<span class="sep">✦</span>Đèn lồng Hội An<span class="sep">✦</span>Trà shan tuyết<span class="sep">✦</span>Mật ong U Minh<span class="sep">✦</span>Khăn thổ cẩm<span class="sep">✦</span></span>
+      <span>Cà phê Đắk Lắk<span class="sep">✦</span>Lụa Hội An<span class="sep">✦</span>Gốm Bát Tràng<span class="sep">✦</span>Nón lá Huế<span class="sep">✦</span>Đèn lồng Hội An<span class="sep">✦</span>Trà shan tuyết<span class="sep">✦</span>Mật ong U Minh<span class="sep">✦</span>Khăn thổ cẩm<span class="sep">✦</span></span>
+    </div>
+  </div>
+
   <main>
     <div class="filters" id="filters">
       <button class="active" data-cat="all">Tất cả</button>
@@ -755,13 +876,15 @@
     }
     $("emptyResult").style.display = "none";
 
-    list.forEach(function (p) {
+    list.forEach(function (p, i) {
       var card = document.createElement("article");
       card.className = "card";
       var stars = "★".repeat(Math.round(p.rating));
+      var hot = p.sold >= 500 ? '<span class="hot">Bán chạy</span>' : "";
+      card.style.animationDelay = Math.min(i * 0.045, 0.4) + "s";
       card.innerHTML =
         '<div class="tile ' + CAT_TILE[p.cat] + '">' +
-          '<span class="tag">' + p.cat + '</span>' + I[p.icon] +
+          '<span class="tag">' + p.cat + '</span>' + hot + I[p.icon] +
         '</div>' +
         '<div class="body">' +
           '<span class="origin">' + p.origin + '</span>' +
