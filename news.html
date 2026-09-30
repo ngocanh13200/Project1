@@ -102,6 +102,35 @@
     white-space: nowrap;
   }
 
+  .clock {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    background: none;
+    border: 1px solid rgba(255,194,75,.3);
+    border-radius: 999px;
+    padding: 7px 14px;
+    cursor: pointer;
+    font-family: "IBM Plex Mono", monospace;
+    transition: all .18s ease;
+    white-space: nowrap;
+  }
+  .clock:hover { border-color: var(--phosphor); background: rgba(76,224,90,.07); }
+  .clock:focus-visible { outline: 2px solid var(--phosphor); outline-offset: 2px; }
+  .clock .clk-date { font-size: 12px; color: var(--amber); }
+  .clock .clk-time { font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: .04em; }
+  .clock .clk-time::after {
+    content: "";
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: transparent;
+    margin-left: 7px;
+    vertical-align: 2px;
+  }
+  .clock.sim .clk-time::after { background: var(--amber); box-shadow: 0 0 8px rgba(255,194,75,.8); }
+  .clock.sim .clk-date { text-decoration: underline dotted rgba(255,194,75,.6); }
+
   /* ---------- Ticker ---------- */
 
   .ticker {
@@ -336,6 +365,125 @@
   }
   .img-day .cap b { color: var(--text); }
 
+  /* ---------- Clock modal ---------- */
+
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(3,16,11,.8);
+    backdrop-filter: blur(3px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 40;
+  }
+  .modal-backdrop.open { display: flex; }
+
+  .modal {
+    width: 100%;
+    max-width: 400px;
+    background: var(--bg2);
+    border: 1px solid var(--panel-edge);
+    border-radius: 18px;
+    padding: 26px;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,.7);
+  }
+  .modal h2 {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .modal .sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+  .modal .sub .sim-note { color: var(--amber); }
+
+  .modal label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    margin-bottom: 8px;
+  }
+  .modal input[type="datetime-local"] {
+    width: 100%;
+    background: rgba(76,224,90,.05);
+    border: 1px solid var(--panel-edge);
+    border-radius: 11px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14.5px;
+    padding: 12px 14px;
+    color-scheme: dark;
+    transition: border-color .18s ease, box-shadow .18s ease;
+  }
+  .modal input[type="datetime-local"]:focus {
+    outline: none;
+    border-color: var(--phosphor);
+    box-shadow: 0 0 0 3px rgba(76,224,90,.15);
+  }
+
+  .presets {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .presets button {
+    background: rgba(76,224,90,.06);
+    border: 1px solid var(--panel-edge);
+    border-radius: 10px;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 10px;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .presets button:hover { border-color: var(--phosphor); color: var(--phosphor); }
+  .presets button:focus-visible { outline: 2px solid var(--phosphor); outline-offset: 2px; }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .btn-primary {
+    flex: 1;
+    background: var(--phosphor);
+    color: #06231F;
+    border: none;
+    border-radius: 11px;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 12px;
+    cursor: pointer;
+    transition: background .18s ease;
+  }
+  .btn-primary:hover { background: var(--phosphor-soft); }
+  .btn-primary:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+  .btn-ghost {
+    flex: 1;
+    background: none;
+    border: 1px solid var(--panel-edge);
+    color: var(--muted);
+    border-radius: 11px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px;
+    cursor: pointer;
+    transition: all .18s ease;
+  }
+  .btn-ghost:hover { border-color: var(--amber); color: var(--amber); }
+  .btn-ghost:focus-visible { outline: 2px solid var(--phosphor); outline-offset: 2px; }
+
   /* ---------- Footer ---------- */
 
   footer {
@@ -379,7 +527,10 @@
       <a href="weather.html">Thời tiết</a>
       <a href="news.html" class="active">Tin tức</a>
     </nav>
-    <div class="date-chip" id="dateChip">—</div>
+    <button class="clock" id="clockBtn" type="button" aria-label="Chỉnh ngày giờ" title="Chỉnh ngày giờ hiển thị">
+      <span class="clk-date" id="clkDate">—</span>
+      <span class="clk-time" id="clkTime">--:--:--</span>
+    </button>
   </header>
 
   <div class="ticker" id="tickerWrap" style="display:none;">
@@ -412,8 +563,29 @@
     <span id="updated">—</span>
   </footer>
 
+  <!-- Clock modal -->
+  <div class="modal-backdrop" id="clockModal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="clockTitle">
+      <h2 id="clockTitle">Chỉnh ngày giờ</h2>
+      <p class="sub" id="clockSub">Đặt ngày giờ hiển thị trên trang. <span class="sim-note" id="simNote" style="display:none;">Đang giả lập — bấm "Giờ thật" để quay lại.</span></p>
+      <label for="clockInput">Ngày &amp; giờ</label>
+      <input type="datetime-local" id="clockInput">
+      <div class="presets">
+        <button type="button" data-preset="now">Hiện tại</button>
+        <button type="button" data-preset="plus1h">+1 giờ</button>
+        <button type="button" data-preset="plus1d">+1 ngày</button>
+        <button type="button" data-preset="tomorrow9">Ngày mai 09:00</button>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" id="clockReset">Giờ thật</button>
+        <button type="button" class="btn-primary" id="clockApply">Áp dụng</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
+<script src="clock.js"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -422,8 +594,34 @@
   var DAYS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
   var MONTHS = ["tháng 1","tháng 2","tháng 3","tháng 4","tháng 5","tháng 6","tháng 7","tháng 8","tháng 9","tháng 10","tháng 11","tháng 12"];
 
-  var now = new Date();
-  $("dateChip").textContent = DAYS[now.getDay()] + ", " + now.getDate() + " " + MONTHS[now.getMonth()] + " " + now.getFullYear();
+  function pad2(n) { return String(n).padStart(2, "0"); }
+
+  var clockBtn = $("clockBtn"), clockModal = $("clockModal"), clockInput = $("clockInput");
+
+  function fmtDate(d) {
+    return DAYS[d.getDay()] + ", " + d.getDate() + " " + MONTHS[d.getMonth()] + " " + d.getFullYear();
+  }
+  function fmtTime(d) {
+    return pad2(d.getHours()) + ":" + pad2(d.getMinutes()) + ":" + pad2(d.getSeconds());
+  }
+  function toLocalInput(d) {
+    return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()) +
+      "T" + pad2(d.getHours()) + ":" + pad2(d.getMinutes());
+  }
+  function refreshClock() {
+    var d = SkyClock.now();
+    $("clkDate").textContent = fmtDate(d);
+    $("clkTime").textContent = fmtTime(d);
+    clockBtn.classList.toggle("sim", SkyClock.isSim());
+    $("simNote").style.display = SkyClock.isSim() ? "inline" : "none";
+  }
+  function refreshUpdated() {
+    var upd = SkyClock.now();
+    $("updated").textContent = "Cập nhật " + pad2(upd.getHours()) + ":" + pad2(upd.getMinutes()) +
+      (SkyClock.isSim() ? " · giờ giả lập" : "");
+  }
+  refreshClock();
+  setInterval(refreshClock, 1000);
 
   function showBanner(msg) {
     banner.textContent = msg;
@@ -553,9 +751,9 @@
       $("imgSec").style.display = "block";
     }
 
-    var upd = new Date();
-    var pad = function (n) { return String(n).padStart(2, "0"); };
-    $("updated").textContent = "Cập nhật " + pad(upd.getHours()) + ":" + pad(upd.getMinutes());
+    var upd = SkyClock.now();
+    $("updated").textContent = "Cập nhật " + pad2(upd.getHours()) + ":" + pad2(upd.getMinutes()) +
+      (SkyClock.isSim() ? " · giờ giả lập" : "");
   }
 
   function esc(s) {
@@ -586,6 +784,7 @@
 
   /* ---------- Load ---------- */
 
+  var now = new Date();
   var y = now.getFullYear();
   var m = String(now.getMonth() + 1).padStart(2, "0");
   var dd = String(now.getDate()).padStart(2, "0");
@@ -600,6 +799,52 @@
       showBanner("Không kết nối được nguồn tin. Hiển thị tin tức mẫu.");
       render(MOCK_ITEMS, MOCK_FEATURED, null);
     });
+
+  /* ---------- Clock widget ---------- */
+
+  clockBtn.addEventListener("click", function () {
+    clockInput.value = toLocalInput(SkyClock.now());
+    clockModal.classList.add("open");
+    clockInput.focus();
+  });
+
+  clockModal.addEventListener("click", function (e) {
+    if (e.target === clockModal) clockModal.classList.remove("open");
+  });
+
+  document.querySelectorAll(".presets button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var base = SkyClock.now();
+      var d = new Date(base);
+      var p = b.getAttribute("data-preset");
+      if (p === "now") d = new Date();
+      else if (p === "plus1h") d = new Date(base.getTime() + 3600000);
+      else if (p === "plus1d") d = new Date(base.getTime() + 86400000);
+      else if (p === "tomorrow9") {
+        d = new Date(base.getTime() + 86400000);
+        d.setHours(9, 0, 0, 0);
+      }
+      clockInput.value = toLocalInput(d);
+    });
+  });
+
+  $("clockApply").addEventListener("click", function () {
+    var v = clockInput.value;
+    if (!v) return;
+    var d = new Date(v);
+    if (isNaN(d.getTime())) return;
+    SkyClock.setSim(d);
+    clockModal.classList.remove("open");
+    refreshClock();
+    refreshUpdated();
+  });
+
+  $("clockReset").addEventListener("click", function () {
+    SkyClock.clearSim();
+    clockModal.classList.remove("open");
+    refreshClock();
+    refreshUpdated();
+  });
 })();
 </script>
 </body>
