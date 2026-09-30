@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkyGate — Tạo tài khoản</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #081A2E;
+    --panel: #0E2740;
+    --panel-edge: #173650;
+    --paper: #FBF6EC;
+    --ink: #1D2733;
+    --ink-soft: #5B6672;
+    --teal: #14C4B2;
+    --teal-dark: #0E9C8E;
+    --gold: #E0A83E;
+    --danger: #E5484D;
+    --line: #E6DECB;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    color: var(--paper);
+    background:
+      radial-gradient(1200px 600px at 85% -10%, rgba(224,168,62,.14), transparent 60%),
+      radial-gradient(900px 520px at -10% 110%, rgba(20,196,178,.16), transparent 55%),
+      var(--bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+  }
+
+  .shell {
+    width: 100%;
+    max-width: 980px;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 40px;
+    align-items: center;
+  }
+
+  /* ---------- Form panel ---------- */
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--teal);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 26px;
+    height: 1px;
+    background: var(--teal);
+  }
+
+  h1 {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(30px, 4vw, 40px);
+    font-weight: 700;
+    letter-spacing: -.02em;
+    line-height: 1.08;
+    margin-bottom: 10px;
+  }
+
+  .lead {
+    color: #9DB3CB;
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 30px;
+  }
+
+  .field { margin-bottom: 6px; }
+
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #CFDCE9;
+    margin-bottom: 7px;
+  }
+
+  .input-wrap { position: relative; }
+
+  .input-wrap input {
+    width: 100%;
+    background: rgba(251,246,236,.055);
+    border: 1px solid var(--panel-edge);
+    border-radius: var(--radius);
+    color: var(--paper);
+    font-family: inherit;
+    font-size: 15px;
+    padding: 13px 15px;
+    transition: border-color .18s ease, background .18s ease, box-shadow .18s ease;
+  }
+
+  .input-wrap input::placeholder { color: #5E7790; }
+
+  .input-wrap input:hover { border-color: #2A4A6A; }
+
+  .input-wrap input:focus {
+    outline: none;
+    border-color: var(--teal);
+    background: rgba(251,246,236,.085);
+    box-shadow: 0 0 0 3px rgba(20,196,178,.18);
+  }
+
+  .input-wrap input[aria-invalid="true"] {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px rgba(229,72,77,.15);
+  }
+
+  .err {
+    visibility: hidden;
+    min-height: 24px;
+    font-size: 12.5px;
+    color: #FF9A9C;
+    margin-top: 6px;
+  }
+  .field.invalid .err { visibility: visible; }
+
+  .pass-row { position: relative; }
+  .pass-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #7E96AF;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 8px;
+    font-family: inherit;
+  }
+  .pass-toggle:hover { color: var(--teal); }
+  .pass-toggle:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+
+  .terms {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 13.5px;
+    color: #9DB3CB;
+    line-height: 1.5;
+    margin: 22px 0;
+    cursor: pointer;
+  }
+  .terms input {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    flex: none;
+    margin-top: 1px;
+    border: 1.5px solid #43607F;
+    border-radius: 5px;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    transition: all .15s ease;
+  }
+  .terms input:checked {
+    background: var(--teal);
+    border-color: var(--teal);
+  }
+  .terms input:checked::after {
+    content: "";
+    position: absolute;
+    left: 5px; top: 1.5px;
+    width: 5px; height: 9px;
+    border: solid var(--bg);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .terms input:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+  .terms a { color: var(--teal); text-decoration: none; }
+  .terms a:hover { text-decoration: underline; }
+  .terms.err-text { color: #FF9A9C; }
+  .terms.err-text input { border-color: var(--danger); }
+
+  .submit {
+    width: 100%;
+    background: var(--teal);
+    color: #06231F;
+    border: none;
+    border-radius: var(--radius);
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: .01em;
+    padding: 15px;
+    cursor: pointer;
+    transition: background .18s ease, transform .1s ease, box-shadow .18s ease;
+    box-shadow: 0 10px 26px -12px rgba(20,196,178,.55);
+  }
+  .submit:hover { background: #2BD3C2; }
+  .submit:active { transform: translateY(1px); }
+  .submit:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; }
+  .submit.done { background: var(--gold); box-shadow: 0 10px 26px -12px rgba(224,168,62,.5); }
+
+  .signin {
+    text-align: center;
+    font-size: 13.5px;
+    color: #7E96AF;
+    margin-top: 22px;
+  }
+  .signin a { color: var(--teal); text-decoration: none; font-weight: 600; }
+  .signin a:hover { text-decoration: underline; }
+
+  /* ---------- Ticket panel ---------- */
+
+  .ticket-panel { display: flex; flex-direction: column; align-items: center; }
+
+  .ticket {
+    width: 100%;
+    max-width: 380px;
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,.55);
+    transform: rotate(1.2deg);
+    transition: transform .3s ease;
+  }
+  .ticket:hover { transform: rotate(0deg) translateY(-3px); }
+
+  .ticket-head {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .brand {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: .04em;
+  }
+  .brand span { color: var(--gold); }
+  .ticket-head .tag {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: .18em;
+    color: var(--teal);
+    text-transform: uppercase;
+  }
+
+  .ticket-body { padding: 22px 20px 18px; }
+
+  .route {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .route .city { font-family: "Space Grotesk", sans-serif; font-size: 30px; font-weight: 700; letter-spacing: -.02em; }
+  .route .flight {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: .14em;
+    color: var(--ink-soft);
+    text-align: center;
+  }
+  .route .flight b { display: block; color: var(--gold); font-size: 13px; letter-spacing: .08em; margin-top: 2px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .cell .k {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+  .cell .v {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cell .v.blank { color: #B9B2A2; font-weight: 500; }
+
+  .dashed {
+    border-top: 2px dashed var(--line);
+    position: relative;
+    margin: 0 20px;
+  }
+  .dashed::before, .dashed::after {
+    content: "";
+    position: absolute;
+    top: -11px;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--bg);
+  }
+  .dashed::before { left: -30px; }
+  .dashed::after { right: -30px; }
+
+  .ticket-foot {
+    padding: 16px 20px 20px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .barcode {
+    height: 46px;
+    flex: 1;
+    background-image: repeating-linear-gradient(
+      90deg,
+      var(--ink) 0 2px, transparent 2px 5px,
+      var(--ink) 5px 6px, transparent 6px 9px,
+      var(--ink) 9px 12px, transparent 12px 14px,
+      var(--ink) 14px 15px, transparent 15px 19px
+    );
+    mask-image: linear-gradient(90deg, #000 85%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent);
+  }
+  .seat .k { font-size: 10px; text-transform: uppercase; letter-spacing: .14em; color: var(--ink-soft); }
+  .seat .v { font-family: "IBM Plex Mono", monospace; font-size: 22px; font-weight: 600; }
+
+  .stamp {
+    position: absolute;
+    inset: 130px 0 auto 0;
+    display: flex;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .stamp span {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: .2em;
+    color: var(--teal-dark);
+    border: 3px solid var(--teal-dark);
+    border-radius: 8px;
+    padding: 4px 14px;
+    transform: rotate(-14deg);
+    opacity: .85;
+  }
+  .ticket.stamped .stamp { animation: stampIn .45s cubic-bezier(.2,1.4,.4,1) forwards; }
+  @keyframes stampIn {
+    from { opacity: 0; transform: scale(1.6) rotate(6deg); }
+    to { opacity: 1; transform: scale(1) rotate(0); }
+  }
+
+  .ticket-caption {
+    font-size: 12.5px;
+    color: #7E96AF;
+    margin-top: 22px;
+    text-align: center;
+    max-width: 320px;
+    line-height: 1.55;
+  }
+
+  /* ---------- Motion ---------- */
+
+  @media (prefers-reduced-motion: no-preference) {
+    .form-panel > * { animation: rise .6s cubic-bezier(.2,.7,.3,1) both; }
+    .form-panel > *:nth-child(2) { animation-delay: .05s; }
+    .form-panel > *:nth-child(3) { animation-delay: .1s; }
+    .ticket { animation: rise .7s cubic-bezier(.2,.7,.3,1) .15s both; }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  }
+
+  /* ---------- Responsive ---------- */
+
+  @media (max-width: 860px) {
+    .shell { grid-template-columns: 1fr; gap: 44px; }
+    .ticket { transform: none; }
+    .ticket-panel { order: -1; }
+    .ticket-caption { display: none; }
+  }
+</style>
+</head>
+<body>
+  <main class="shell">
+
+    <section class="form-panel">
+      <p class="eyebrow">SkyGate · Đăng ký</p>
+      <h1>Tạo tài khoản</h1>
+      <p class="lead">Điền thông tin bên dưới để nhận thẻ lên máy bay của bạn. Mọi thứ được cập nhật trực tiếp trên thẻ.</p>
+
+      <form id="registerForm" novalidate>
+        <div class="field" data-field="name">
+          <label for="name">Họ và tên</label>
+          <div class="input-wrap">
+            <input type="text" id="name" name="name" placeholder="Nguyễn Văn A" autocomplete="name">
+          </div>
+          <p class="err">Vui lòng nhập họ và tên.</p>
+        </div>
+
+        <div class="field" data-field="email">
+          <label for="email">Email</label>
+          <div class="input-wrap">
+            <input type="email" id="email" name="email" placeholder="ban@vidu.com" autocomplete="email">
+          </div>
+          <p class="err">Email không hợp lệ.</p>
+        </div>
+
+        <div class="field" data-field="password">
+          <label for="password">Mật khẩu</label>
+          <div class="input-wrap pass-row">
+            <input type="password" id="password" name="password" placeholder="Ít nhất 8 ký tự" autocomplete="new-password">
+            <button type="button" class="pass-toggle" aria-label="Hiện mật khẩu">Hiện</button>
+          </div>
+          <p class="err">Mật khẩu phải có ít nhất 8 ký tự.</p>
+        </div>
+
+        <div class="field" data-field="confirm">
+          <label for="confirm">Nhập lại mật khẩu</label>
+          <div class="input-wrap">
+            <input type="password" id="confirm" name="confirm" placeholder="Nhập lại mật khẩu" autocomplete="new-password">
+          </div>
+          <p class="err">Mật khẩu không khớp.</p>
+        </div>
+
+        <label class="terms" id="termsLabel">
+          <input type="checkbox" id="terms" name="terms">
+          <span>Tôi đồng ý với <a href="#" onclick="return false">Điều khoản dịch vụ</a> và <a href="#" onclick="return false">Chính sách bảo mật</a>.</span>
+        </label>
+
+        <button type="submit" class="submit" id="submitBtn">Tạo tài khoản</button>
+        <p class="signin">Đã có tài khoản? <a href="#">Đăng nhập</a></p>
+      </form>
+    </section>
+
+    <aside class="ticket-panel">
+      <div class="ticket" id="ticket" aria-hidden="true">
+        <div class="ticket-head">
+          <div class="brand">SKY<span>GATE</span></div>
+          <div class="tag">Boarding Pass</div>
+        </div>
+        <div class="ticket-body">
+          <div class="route">
+            <span class="city">HAN</span>
+            <span class="flight">Flight<b id="tFlight">SKG-042</b></span>
+            <span class="city">SGN</span>
+          </div>
+          <div class="grid">
+            <div class="cell">
+              <div class="k">Hành khách</div>
+              <div class="v blank" id="tName">—</div>
+            </div>
+            <div class="cell">
+              <div class="k">Cổng</div>
+              <div class="v" id="tGate">A7</div>
+            </div>
+            <div class="cell">
+              <div class="k">Ghế</div>
+              <div class="v" id="tSeat">12C</div>
+            </div>
+          </div>
+          <div class="grid">
+            <div class="cell">
+              <div class="k">Email</div>
+              <div class="v blank" id="tMail">—</div>
+            </div>
+            <div class="cell">
+              <div class="k">Ngày</div>
+              <div class="v" id="tDate">—</div>
+            </div>
+            <div class="cell">
+              <div class="k">Giờ lên tàu</div>
+              <div class="v">09:45</div>
+            </div>
+          </div>
+        </div>
+        <div class="dashed"></div>
+        <div class="ticket-foot">
+          <div class="barcode" id="barcode"></div>
+          <div class="seat">
+            <div class="k">Ghế</div>
+            <div class="v" id="tSeatFoot">12C</div>
+          </div>
+        </div>
+        <div class="stamp"><span>ĐÃ DUYỆT</span></div>
+      </div>
+      <p class="ticket-caption">Thẻ của bạn cập nhật theo từng ô bạn điền. Hoàn tất để nhận vé chính thức.</p>
+    </aside>
+
+  </main>
+
+<script>
+(function () {
+  var form = document.getElementById("registerForm");
+  var nameEl = document.getElementById("name");
+  var emailEl = document.getElementById("email");
+  var passEl = document.getElementById("password");
+  var confEl = document.getElementById("confirm");
+  var termsEl = document.getElementById("terms");
+  var btn = document.getElementById("submitBtn");
+  var ticket = document.getElementById("ticket");
+  var tName = document.getElementById("tName");
+  var tMail = document.getElementById("tMail");
+  var tDate = document.getElementById("tDate");
+
+  var seats = ["12C","07A","23F","04B","18D","09E","21C","15A"];
+  var seat = seats[Math.floor(Math.random() * seats.length)];
+  var stamped = false;
+
+  var today = new Date();
+  var dd = String(today.getDate()).padStart(2, "0");
+  var mm = String(today.getMonth() + 1).padStart(2, "0");
+  tDate.textContent = dd + "/" + mm + "/" + today.getFullYear();
+
+  document.querySelectorAll("[id^=tSeat]").forEach(function (el) { el.textContent = seat; });
+
+  function maskEmail(v) {
+    v = v.trim();
+    if (!v) return "—";
+    var at = v.indexOf("@");
+    if (at <= 0) return v.slice(0, 1) + "•••";
+    var local = v.slice(0, at);
+    var shown = local.length > 2 ? local.slice(0, 2) : local.slice(0, 1);
+    return shown + "•••@" + v.slice(at + 1);
+  }
+
+  function updateTicket() {
+    var n = nameEl.value.trim();
+    tName.textContent = n || "—";
+    tName.classList.toggle("blank", !n);
+    var m = maskEmail(emailEl.value);
+    tMail.textContent = m;
+    tMail.classList.toggle("blank", m === "—");
+  }
+
+  nameEl.addEventListener("input", updateTicket);
+  emailEl.addEventListener("input", updateTicket);
+
+  var passToggle = document.querySelector(".pass-toggle");
+  passToggle.addEventListener("click", function () {
+    var show = passEl.type === "password";
+    passEl.type = show ? "text" : "password";
+    passToggle.textContent = show ? "Ẩn" : "Hiện";
+    passToggle.setAttribute("aria-label", show ? "Ẩn mật khẩu" : "Hiện mật khẩu");
+  });
+
+  function setInvalid(field, bad) {
+    field.classList.toggle("invalid", bad);
+    var input = field.querySelector("input");
+    if (input) input.setAttribute("aria-invalid", bad ? "true" : "false");
+  }
+
+  function validate() {
+    var ok = true;
+    var nameField = document.querySelector('[data-field="name"]');
+    var emailField = document.querySelector('[data-field="email"]');
+    var passField = document.querySelector('[data-field="password"]');
+    var confField = document.querySelector('[data-field="confirm"]');
+
+    var nameOk = nameEl.value.trim().length >= 2;
+    var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(emailEl.value.trim());
+    var passOk = passEl.value.length >= 8;
+    var confOk = confEl.value === passEl.value && confEl.value !== "";
+
+    setInvalid(nameField, !nameOk);
+    setInvalid(emailField, !emailOk);
+    setInvalid(passField, !passOk);
+    setInvalid(confField, !confOk);
+
+    termsEl.closest(".terms").classList.toggle("err-text", !termsEl.checked);
+
+    return nameOk && emailOk && passOk && confOk && termsEl.checked;
+  }
+
+  [nameEl, emailEl, passEl, confEl].forEach(function (el) {
+    el.addEventListener("blur", validate);
+  });
+  termsEl.addEventListener("change", validate);
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (!validate()) {
+      var firstBad = form.querySelector(".field.invalid input, .terms.err-text input");
+      if (firstBad) firstBad.focus();
+      return;
+    }
+    btn.textContent = "Đã tạo tài khoản ✓";
+    btn.classList.add("done");
+    btn.disabled = true;
+    if (!stamped) {
+      stamped = true;
+      ticket.classList.add("stamped");
+      setTimeout(function () { ticket.classList.remove("stamped"); }, 2600);
+    }
+  });
+})();
+</script>
+</body>
+</html>
