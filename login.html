@@ -223,6 +223,15 @@
   .submit:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; }
   .submit.done { background: var(--gold); box-shadow: 0 10px 26px -12px rgba(224,168,62,.5); }
 
+  .auth-err {
+    min-height: 0;
+    font-size: 13px;
+    color: #FF9A9C;
+    margin: -8px 0 14px;
+    display: none;
+  }
+  .auth-err.show { display: block; }
+
   .signin {
     text-align: center;
     font-size: 13.5px;
@@ -452,9 +461,11 @@
           <a class="forgot" href="#">Quên mật khẩu?</a>
         </div>
 
+        <p class="auth-err" id="authErr" role="alert"></p>
+
         <button type="submit" class="submit" id="submitBtn">Đăng nhập</button>
         <p class="signin">Chưa có tài khoản? <a href="index.html">Đăng ký ngay</a></p>
-        <p class="demo-hint">Demo: nhập email và mật khẩu bất kỳ để đăng nhập.</p>
+        <p class="demo-hint">Đăng ký tài khoản trước, rồi đăng nhập bằng email và mật khẩu đã đăng ký.</p>
       </form>
     </section>
 
@@ -514,6 +525,7 @@
 
   </main>
 
+<script src="store.js"></script>
 <script>
 (function () {
   var form = document.getElementById("loginForm");
@@ -588,13 +600,28 @@
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
+    var authErr = document.getElementById("authErr");
+    authErr.classList.remove("show");
     if (!validate()) {
       var firstBad = form.querySelector(".field.invalid input");
       if (firstBad) firstBad.focus();
       return;
     }
     var email = emailEl.value.trim();
-    var name = deriveName(email);
+    var user = window.SkyGateStore.findByEmail(email);
+    if (!user) {
+      authErr.textContent = "Email chưa được đăng ký. Vui lòng tạo tài khoản trước.";
+      authErr.classList.add("show");
+      emailEl.focus();
+      return;
+    }
+    if (user.password !== passEl.value) {
+      authErr.textContent = "Mật khẩu không đúng. Vui lòng thử lại.";
+      authErr.classList.add("show");
+      passEl.focus();
+      return;
+    }
+    var name = user.name || deriveName(email);
     tName.textContent = name;
     tName.classList.remove("blank");
     var seat = seats[Math.floor(Math.random() * seats.length)];
